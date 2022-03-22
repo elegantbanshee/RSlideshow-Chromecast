@@ -29,7 +29,7 @@ public class PlayThread extends Thread {
     public static MainActivity activity;
     public static double lastRun = 0;
     private boolean getImages = false;
-    private boolean isWaitingImage = false;
+    private static boolean isWaitingImage = false;
 
     public PlayThread(MainActivity activity) {
         PlayThread.activity = activity;
@@ -39,6 +39,7 @@ public class PlayThread extends Thread {
     public static void moveRight() {
         VideoView videoView = activity.findViewById(R.id.videoView);
         videoView.stopPlayback();
+        isWaitingImage = false;
         lastRun = 0;
     }
 
@@ -49,6 +50,7 @@ public class PlayThread extends Thread {
         if (RSlideshowAPI.index < 0)
             RSlideshowAPI.index = 0;
         PlayThread.lastRun = 0;
+        isWaitingImage = false;
     }
 
     public static void handleSettingsButton() {
