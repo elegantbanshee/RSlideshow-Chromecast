@@ -11,7 +11,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.VideoView;
 
-import com.squareup.picasso.Picasso;
+import androidx.annotation.Nullable;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,6 +29,7 @@ public class PlayThread extends Thread {
     public static MainActivity activity;
     public static double lastRun = 0;
     private boolean getImages = false;
+    private boolean isWaitingImage = false;
 
     public PlayThread(MainActivity activity) {
         PlayThread.activity = activity;
@@ -174,6 +181,9 @@ public class PlayThread extends Thread {
         if (videoView.isPlaying())
             return;
 
+        if (isWaitingImage)
+            return;
+
         JSONObject image = RSlideshowAPI.images.getJSONObject(RSlideshowAPI.index);
         String imageUrl = image.getString("url");
         boolean isImage = !imageUrl.contains(".mp4");
@@ -182,9 +192,24 @@ public class PlayThread extends Thread {
             videoView.stopPlayback();
             videoView.setVisibility(View.INVISIBLE);
             imageView.setVisibility(View.VISIBLE);
-            Picasso.with(activity).load(imageUrl).into(imageView);
+            Glide.with(activity).addDefaultRequestListener(new RequestListener<Object>() {
+                @Override
+                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Object> target, boolean isFirstResource) {
+                    lastRun = System.currentTimeMillis();
+                    isWaitingImage = false;
+                    return false;
+                }
+
+                @Override
+                public boolean onResourceReady(Object resource, Object model, Target<Object> target, DataSource dataSource, boolean isFirstResource) {
+                    lastRun = System.currentTimeMillis();
+                    isWaitingImage = false;
+                    return false;
+                }
+            }).load(imageUrl).into(imageView);
             imageView.bringToFront();
             titleView.bringToFront();
+            isWaitingImage = true;
         }
         else {
             imageView.setVisibility(View.INVISIBLE);
