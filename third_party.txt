@@ -1,0 +1,13 @@
+RSlideshow-Chromecast makes use of third-party libraries.
+
+okhttp
+Apache 2.0
+https://github.com/square/okhttp
+
+picasso
+Apache 2.0
+https://github.com/square/picasso
+
+android-gif-drawable
+MIT
+https://github.com/koral--/android-gif-drawable
