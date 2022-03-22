@@ -1,12 +1,16 @@
 package com.frozenironsoftware.rslideshow_chromecast;
 
-import com.goebl.david.Response;
-import com.goebl.david.Webb;
-import com.goebl.david.WebbException;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
+
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class RSlideshowAPI {
     private static final String API_URL = "https://rslideshow.rolando.org";
@@ -16,8 +20,6 @@ public class RSlideshowAPI {
     public static JSONArray subreddits = new JSONArray();
 
     public static void getImages() throws JSONException {
-        Webb webb = Webb.create();
-        Response<JSONObject> json;
 
         setSubreddits();
 
@@ -39,16 +41,16 @@ public class RSlideshowAPI {
 
         String body = String.format("%s;%s", subredditsString, pagesString);
 
+        String response;
         try {
-            json = webb.post(String.format("%s/api/data", API_URL))
-                    .body(body)
-                    .asJsonObject();
+            response = post(String.format("%s/api/data", API_URL), body);
+
         }
-        catch (WebbException e) {
+        catch (IOException e) {
             e.printStackTrace();
             return;
         }
-        JSONObject data = json.getBody();
+        JSONObject data = new JSONObject(response);
         JSONArray images = data.getJSONArray("data");
         JSONArray pages = data.getJSONArray("after");
 
@@ -56,6 +58,18 @@ public class RSlideshowAPI {
             RSlideshowAPI.images.put(images.getJSONObject(imageIndex));
 
         RSlideshowAPI.pages = pages;
+    }
+
+    private static String post(String url, String json) throws IOException {
+        OkHttpClient client = new OkHttpClient();
+        RequestBody body = RequestBody.create(json, MediaType.get("text/plain; charset=utf-8"));
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+        try (Response response = client.newCall(request).execute()) {
+            return response.body().string();
+        }
     }
 
     private static void setSubreddits() {
