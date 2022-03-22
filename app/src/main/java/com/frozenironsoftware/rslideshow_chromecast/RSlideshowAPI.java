@@ -12,8 +12,8 @@ public class RSlideshowAPI {
     private static final String API_URL = "https://rslideshow.rolando.org";
     public static JSONArray images = new JSONArray();
     public static int index = 0;
-    private static JSONArray pages = new JSONArray();
-    private static JSONArray subreddits = new JSONArray();
+    public static JSONArray pages = new JSONArray();
+    public static JSONArray subreddits = new JSONArray();
 
     public static void getImages() throws JSONException {
         Webb webb = Webb.create();

@@ -13,8 +13,11 @@ import android.widget.VideoView;
 
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import pl.droidsonroids.gif.GifImageView;
 
 public class PlayThread extends Thread {
     public static MainActivity activity;
@@ -27,10 +30,14 @@ public class PlayThread extends Thread {
     }
 
     public static void moveRight() {
+        VideoView videoView = activity.findViewById(R.id.videoView);
+        videoView.stopPlayback();
         lastRun = 0;
     }
 
     public static void moveLeft() {
+        VideoView videoView = activity.findViewById(R.id.videoView);
+        videoView.stopPlayback();
         RSlideshowAPI.index -= 2;
         if (RSlideshowAPI.index < 0)
             RSlideshowAPI.index = 0;
@@ -59,6 +66,9 @@ public class PlayThread extends Thread {
             editTextSubredditsView.setVisibility(View.INVISIBLE);
             Storage.setSubreddits(editTextSubredditsView.getText().toString());
             RSlideshowAPI.index = 0;
+            RSlideshowAPI.images = new JSONArray();
+            RSlideshowAPI.pages = new JSONArray();
+            RSlideshowAPI.subreddits = new JSONArray();
             Thread thread = new Thread(() -> {
                 try {
                     RSlideshowAPI.getImages();
@@ -155,7 +165,7 @@ public class PlayThread extends Thread {
 
     private void play() throws JSONException {
         VideoView videoView = activity.findViewById(R.id.videoView);
-        ImageView imageView = activity.findViewById(R.id.imageView);
+        GifImageView imageView = activity.findViewById(R.id.imageView);
         TextView titleView = activity.findViewById(R.id.titleView);
 
         if (RSlideshowAPI.images.length() == 0 ||
@@ -187,6 +197,7 @@ public class PlayThread extends Thread {
             //updateVideoPosition(imageUrl);
 
             videoView.bringToFront();
+            titleView.bringToFront();
         }
 
         titleView.setText(String.format("r/%s | %s",
