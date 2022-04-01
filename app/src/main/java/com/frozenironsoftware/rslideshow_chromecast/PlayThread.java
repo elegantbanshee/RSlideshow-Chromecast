@@ -1,6 +1,9 @@
 package com.frozenironsoftware.rslideshow_chromecast;
 
+import android.graphics.Bitmap;
 import android.graphics.Point;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -23,6 +26,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import pl.droidsonroids.gif.GifDrawable;
 import pl.droidsonroids.gif.GifImageView;
 
 public class PlayThread extends Thread {
@@ -184,6 +188,9 @@ public class PlayThread extends Thread {
             return;
 
         if (isWaitingImage)
+            return;
+        Drawable drawable = imageView.getDrawable();
+        if (drawable instanceof GifDrawable && ((GifDrawable)drawable).isRunning())
             return;
 
         JSONObject image = RSlideshowAPI.images.getJSONObject(RSlideshowAPI.index);

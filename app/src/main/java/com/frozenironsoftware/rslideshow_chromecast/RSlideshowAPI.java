@@ -14,6 +14,7 @@ import okhttp3.Response;
 
 public class RSlideshowAPI {
     private static final String API_URL = "https://rslideshow.rolando.org";
+    private static final String USER_AGENT = "com.frozenironsoftware.RSlideshow/1.0";
     public static JSONArray images = new JSONArray();
     public static int index = 0;
     public static JSONArray pages = new JSONArray();
@@ -66,6 +67,7 @@ public class RSlideshowAPI {
         Request request = new Request.Builder()
                 .url(url)
                 .post(body)
+                .header("User-Agent", USER_AGENT)
                 .build();
         try (Response response = client.newCall(request).execute()) {
             return response.body().string();
